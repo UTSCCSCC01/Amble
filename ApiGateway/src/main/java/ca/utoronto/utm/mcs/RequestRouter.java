@@ -13,6 +13,11 @@ import com.sun.net.httpserver.HttpHandler;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.net.http.HttpRequest.BodyPublisher;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpRequest.Builder;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.util.HashMap;
 import java.net.URI;
 import java.io.OutputStream;    // Also given to you to send back your response
 
@@ -22,120 +27,75 @@ public class RequestRouter implements HttpHandler {
      * You may add and/or initialize attributes here if you 
      * need.
      */
-	public RequestRouter() {
+        //Maps the path to applicable host
+        // /location -> location microservice
+        // /
+        HashMap<String, String> context_map;
+        HttpClient http_client;
 
+
+	public RequestRouter() {
+                http_client = HttpClient.newHttpClient();
+                context_map = new HashMap<String, String>();
+
+                context_map.put("location", "http://locationmicroservice:8000");
+                context_map.put("user", "http://usermicroservice:8000");
+                context_map.put("trip", "http://tripinfomicroservice:8000");
 	}
+   
+
+        /* Creates a HttpRequest object that is to be directed to the context mapped microservice*/
+        public HttpRequest requestBuilder(HttpExchange request, String context) throws IOException, InterruptedException, IllegalStateException{
+                //Gather information required to build a new request object
+                Builder req = HttpRequest.newBuilder();
+                BodyPublisher body = BodyPublishers.ofByteArray(request.getRequestBody().readAllBytes());
+                String uri_gen = context_map.get(context) + request.getRequestURI().toString();
+                //Build request object
+                req.uri(URI.create(uri_gen)); //set uri
+                req.method(request.getRequestMethod(), body);
+                HttpRequest indexed_req = req.build();
+                return indexed_req;
+        }
+
+        public void sendResponse(HttpRequest request, HttpExchange r) throws IOException, InterruptedException{
+                /*Takes a http request to the microservice, get its responseObject, and and sends it to the 
+                 * the original caller. 
+                */
+                HttpResponse<byte[]> response = http_client.send(request, BodyHandlers.ofByteArray());
+                r.sendResponseHeaders(response.statusCode(),response.body().length);
+                OutputStream os = r.getResponseBody();
+                os.write(response.body());
+                os.close();
+                return;
+        }
+
+        public void handleError(HttpExchange r, String payload, int errorCode) throws IOException{
+                r.sendResponseHeaders(errorCode, payload.length());
+                OutputStream os = r.getResponseBody();
+                os.write(payload.getBytes());
+                os.close();
+                return;
+        }
 
 	@Override
 	public void handle(HttpExchange r) throws IOException {
-                try {
-                        String uri = r.getRequestURI().toString();
-                        String[] uriParts = uri.split("/");
-                        if (uriParts[0].equals("") && uriParts[1].equals("location") ){
-                                  switch(r.getRequestMethod()){
-                                        case "GET":
-                                                if(uriParts[2].equals(":uid")){
-                                                        String response = "payload";
-                                                        r.sendResponseHeaders(200, response.length());
-                                                        OutputStream os = r.getResponseBody();
-                                                        os.write(response.getBytes());
-                                                        os.close();
-                                                }
-                                                if(uriParts[2].equals("nearbyDriver")){
+                String[] tokens = r.getRequestURI().getPath().replaceFirst("/", "").split("/");
+                String url_context = tokens[0];
+                System.out.println(url_context);
 
-                                                }
-                                                if(uriParts[2].equals("navigation")){
-
-                                                }
-                                                System.out.println("Get the request");
-                                        case "PUT":
-                                                if(uriParts[2].equals("user")){
-
-                                                }
-                                                if(uriParts[2].equals("road")){
-
-                                                }
-                                        case "POST":
-                                                if(uriParts[2].equals("hasRoute")){
-
-                                                }
-                                        case "PATCH":
-                                                if(uriParts[2].equals(":uid")){
-
-                                                }
-                                        case "DELETE":
-                                                if(uriParts[2].equals("user")){
-
-                                                }
-                                                if(uriParts[2].equals("route")){
-
-                                                }
-                                        default:
-                                                r.sendResponseHeaders(500, -1);
-                                                return; 
-
-                                  }      
+                if(context_map.containsKey(url_context)){
+                        try{
+                                HttpRequest request = requestBuilder(r, url_context);
+                                sendResponse(request, r);
+                                return;
+                        }catch(Exception e){    
+                                System.out.println("Error has occured");
+                                //Send Error intenal server.
+                                handleError(r,"An internal server error has occured",500);
+                                return;
                         }
-                        else if (uriParts[0].equals("") && uriParts[1].equals("trip") ){
-                                  switch(r.getRequestMethod()){
-                                        case "GET":
-                                                if(uriParts[2].equals("passenger")){
-
-                                                }
-                                                if(uriParts[2].equals("driver")){
-
-                                                }
-                                                if(uriParts[2].equals("driverTime")){
-
-                                                }
-                                        case "POST":
-                                                if(uriParts[2].equals("confirm")){
-
-                                                }
-                                                if(uriParts[2].equals("request")){
-
-                                                }
-                                        case "PATCH":
-                                                if(uriParts[2].equals(":_id")){
-
-                                                }
-                                        default:
-                                                r.sendResponseHeaders(500, -1);
-                                                return; 
-
-
-                                  }      
-                        }
-                        else if (uriParts[0].equals("") && uriParts[1].equals("user") ){
-                                  switch(r.getRequestMethod()){
-                                        case "GET":
-                                                if(uriParts[2].equals(":uid")){
-
-                                                }
-                                        case "POST":
-                                                if(uriParts[2].equals("register")){
-
-                                                }
-                                                if(uriParts[2].equals("login")){
-
-                                                }
-                                        case "PATCH":
-                                                if(uriParts[2].equals(":uid")){
-
-                                                }
-                                        default:
-                                                r.sendResponseHeaders(500, -1);
-                                                return; 
-
-                                  }      
-                        }
-                        else{
-                                r.sendResponseHeaders(500, -1);
-                                return;  
-                        }
-                }catch(Exception e){
-                        r.sendResponseHeaders(500, -1);
-                        e.printStackTrace();
                 }
-        }
+
+                handleError(r, "Not Found", 404);
+	}
 }
