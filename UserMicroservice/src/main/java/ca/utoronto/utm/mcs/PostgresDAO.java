@@ -1,6 +1,9 @@
 package ca.utoronto.utm.mcs;
 
 import java.sql.*;
+
+import javax.naming.spi.DirStateFactory.Result;
+
 import io.github.cdimascio.dotenv.Dotenv;
 
 public class PostgresDAO {
@@ -35,6 +38,46 @@ public class PostgresDAO {
         query = String.format(query, uid);
         return this.st.executeQuery(query);
     }
+
+    //-------------
+
+    
+
+    //Adds a user
+    public ResultSet addUser(String email, String name, String password) throws SQLException{ //done
+        String query = "INSERT INTO Users(email, prefer_name, password, rides) VALUES(?, ?, ?, ?)";
+
+        try {
+            PreparedStatement ps = this.conn.prepareStatement(query);
+            ps.setString(1, email);
+            ps.setString(2, name);
+            ps.setString(3, password);
+            ps.setInt(4, 0);
+            return ps.executeQuery();
+        } catch (Exception e) {
+            System.out.println("Error occurred");
+        }
+
+        return null;
+    }
+
+    //Gets the users password from a given user, and its uid
+    public ResultSet getUserCred(String email) throws SQLException{ //done
+        String query = "SELECT uid, password FROM users WHERE email= ?";
+        
+        try {
+            PreparedStatement ps = this.conn.prepareStatement(query);
+            ps.setString(1, email);
+            return ps.executeQuery();
+        } catch (Exception e) {
+            System.out.println("Error occurred");
+        }
+        return null;
+
+    }
+
+    //-------------
+
 
     public void updateUserAttributes(int uid, String email, String password, String prefer_name, Integer rides, Boolean isDriver) throws SQLException {
 
