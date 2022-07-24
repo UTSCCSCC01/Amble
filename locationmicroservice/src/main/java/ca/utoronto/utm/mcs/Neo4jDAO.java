@@ -86,4 +86,21 @@ public class Neo4jDAO {
         query = String.format(query, roadname1, roadname2);
         return this.session.run(query);
     }
+
+    public Result findDistance(double user_pt1, String user_pt2, String driver_pt1, String driver_pt2){
+        // ! Check whether to pass a string or float
+        String query = "WITH point({x: %f, y: %f, crs: 'cartesian'}) AS p1, point({x: %f, y: %f, crs: 'cartesian'}) AS p2 RETURN point.distance(p1,p2) AS dist";
+        query = String.format(query, user_pt1, user_pt2, driver_pt1, driver_pt2 );
+        return this.session.run(query);
+    }
+    public Result findShortestPath(String uid, String duid){
+        String query = "MATCH(n: user {uid: '%s'}), (d: user {uid: '%s'}), p = shortestPath((n)-[:ROUTE_TO*]-(d)) RETURN nodes(p)";
+        query = String.format(query, uid, duid);
+        return this.session.run(query);
+    }
+    public Result findDriversWithinRadius(String uid, double radius){
+        String query = "MATCH (t:user {uid: '%s'}), (o: user{is_driver:true}) WHERE point.distance(point({longitude: t.longitude, latitude: t.latitude}), point({longitude: o.longitude, latitude: o.latitude})) < %f Return (o)";
+        query = String.format(query, uid, radius);
+        return this.session.run(query);
+    }
 } 

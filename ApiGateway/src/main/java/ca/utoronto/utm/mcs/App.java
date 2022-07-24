@@ -13,7 +13,7 @@ public class App {
         // TODO: Add server contexts here. Do not set executors for the server, you shouldn't need them.
 		
 		server.createContext("/", new RequestRouter());
-
+		
 		//? /test  -> /
 			
         server.start();
