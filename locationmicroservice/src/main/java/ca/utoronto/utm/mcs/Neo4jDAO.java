@@ -86,42 +86,48 @@ public class Neo4jDAO {
         query = String.format(query, roadname1, roadname2);
         return this.session.run(query);
     }
+    
+    public Result findAllDrivers(){
+        String query = "MATCH (d: user {is_driver: true }) RETURN d";
+        return this.session.run(query);
+    }
+    
+    public Result findDistance(double user_pt1, double user_pt2, double driver_pt1, double driver_pt2){
+        String query = "WITH point({longitude: %f, latitude:  %f, height: 100}) as p1, point({longitude:  %f, latitude:  %f, height: 100}) as p2 RETURN point.distance(p1,p2) as dist";
+        query = String.format(query, user_pt1, user_pt2, driver_pt1, driver_pt2 );
+        return this.session.run(query);
+    }
 
-    // public Result findDistance(double user_pt1, String user_pt2, String driver_pt1, String driver_pt2){
-    //     // ! Check whether to pass a string or float
-    //     String query = "WITH point({x: %f, y: %f, crs: 'cartesian'}) AS p1, point({x: %f, y: %f, crs: 'cartesian'}) AS p2 RETURN point.distance(p1,p2) AS dist";
-    //     query = String.format(query, user_pt1, user_pt2, driver_pt1, driver_pt2 );
+
+    // public Result findShortestPath(String uid, String duid){
+    //     String query = "
+    //                     MATCH (source: user {uid: %s}), (target: user {uid: %s})
+    //                     CALL gds.shortestPath.dijkstra.stream({
+    //                         nodeProjection: 'road',
+    //                         relationshipProjection: {
+    //                             ROUTE_TO: {
+    //                                 type: 'ROUTE_TO',
+    //                                 properties: 'travel_time'
+    //                             } 
+    //                         },
+    //                         sourceNode: source,
+    //                         targetNode: target,
+    //                         relationshipWeightProperty: 'travel_time'
+    //                     })
+    //                     YIELD totalCost, nodeIds, costs, path
+    //                     RETURN
+    //                         totalCost, 
+    //                         [nodeId IN nodeIds | gds.util.asNode(nodeId).name] AS nodeNames,
+    //                         costs, 
+    //                         nodes(path) as path";
+    //     query = String.format(query, uid, duid);
     //     return this.session.run(query);
     // }
 
-    public Result findShortestPath(String uid, String duid){
-        String query = "
-                        MATCH (source: user {uid: %s}), (target: user {uid: %s})
-                        CALL gds.shortestPath.dijkstra.stream({
-                            nodeProjection: 'road',
-                            relationshipProjection: {
-                                ROUTE_TO: {
-                                    type: 'ROUTE_TO',
-                                    properties: 'travel_time'
-                                } 
-                            },
-                            sourceNode: source,
-                            targetNode: target,
-                            relationshipWeightProperty: 'travel_time'
-                        })
-                        YIELD totalCost, nodeIds, costs, path
-                        RETURN
-                            totalCost, 
-                            [nodeId IN nodeIds | gds.util.asNode(nodeId).name] AS nodeNames,
-                            costs, 
-                            nodes(path) as path";
-        query = String.format(query, uid, duid);
-        return this.session.run(query);
-    }
-
-    public Result findDriversWithinRadius(String uid, double radius){
-        String query = "MATCH (t:user {uid: '%s'}), (o: user{is_driver:true}) WHERE point.distance(point({longitude: t.longitude, latitude: t.latitude}), point({longitude: o.longitude, latitude: o.latitude})) < %f Return (o)";
-        query = String.format(query, uid, radius);
-        return this.session.run(query);
-    }
+    // public Result findDriversWithinRadius(String uid, double radius){
+    //     // String query = "MATCH (t:user {uid: '%s'}), (o: user{is_driver:true}) WHERE point.distance(point({longitude: t.longitude, latitude: t.latitude}), point({longitude: o.longitude, latitude: o.latitude})) < %f Return (o)";
+    //     String query = "MATCH (t:user {uid: '%s'}) WITH t MATCH (o: user{is_driver:true}) WHERE point.distance(point({longitude: t.longitude, latitude: t.latitude}), point({longitude: o.longitude, latitude: o.latitude})) < %f Return (o)";
+    //     query = String.format(query, uid, radius);
+    //     return this.session.run(query);
+    // }
 } 
