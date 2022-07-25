@@ -87,6 +87,11 @@ public class Nearby extends Endpoint {
                 }
 
             }
+            
+            if (data.length() == 0){
+                this.sendStatus(r, 404);
+                return;
+            }
             res.put("data", data);
             this.sendResponse(r, res, 200);
 
