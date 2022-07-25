@@ -1,7 +1,13 @@
 package ca.utoronto.utm.mcs;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.neo4j.driver.*;
+import java.util.*;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.neo4j.driver.Record;
+import org.neo4j.driver.types.*;
 
 public class Neo4jDAO {
 
@@ -86,4 +92,60 @@ public class Neo4jDAO {
         query = String.format(query, roadname1, roadname2);
         return this.session.run(query);
     }
+    
+    public Result findAllDrivers(){
+        String query = "MATCH (d: user {is_driver: true }) RETURN d";
+        return this.session.run(query);
+    }
+    
+    public Result findDistance(double user_pt1, double user_pt2, double driver_pt1, double driver_pt2){
+        String query = "WITH point({longitude: %f, latitude:  %f, height: 100}) as p1, point({longitude:  %f, latitude:  %f, height: 100}) as p2 RETURN point.distance(p1,p2) as dist";
+        query = String.format(query, user_pt1, user_pt2, driver_pt1, driver_pt2 );
+        return this.session.run(query);
+    }
+
+    public Result findUser(String uid) {
+        String query = "MATCH (n: user {uid: '%s' }) RETURN n.longitude, n.latitude, n.street, n.is_driver";
+        query = String.format(query, uid);
+        return this.session.run(query);
+    }
+
+    // public Result findDriversWithinRadius(String uid, double radius){
+    //     // String query = "MATCH (t:user {uid: '%s'}), (o: user{is_driver:true}) WHERE point.distance(point({longitude: t.longitude, latitude: t.latitude}), point({longitude: o.longitude, latitude: o.latitude})) < %f Return (o)";
+    //     String query = "MATCH (t:user {uid: '%s'}) WITH t MATCH (o: user{is_driver:true}) WHERE point.distance(point({longitude: t.longitude, latitude: t.latitude}), point({longitude: o.longitude, latitude: o.latitude})) < %f Return (o)";
+    //     query = String.format(query, uid, radius);
+    //     return this.session.run(query);
+    // }
+
+
+    // public Result getgraph(){
+    //     String query = "RETURN gds.graph.exists('streetGraph') AS graphExists";
+    //     Result graphExistsResult = this.session.run(query);
+    //     return graphExistsResult;
+    // }
+    // public Result graphName()
+        
+    public Result findShortestPath(String user_road, String driver_road){
+        String query = """
+                        MATCH (source:road {name: '%s'}), (target:road {name: '%s'})
+                        CALL gds.shortestPath.dijkstra.stream({
+                            nodeProjection: 'road',
+                            relationshipProjection: 'ROUTE_TO',
+                            relationshipProperties: 'travel_time',
+                            sourceNode: source,
+                            targetNode: target,
+                            relationshipWeightProperty: 'travel_time'
+                        })
+                        YIELD index, sourceNode, targetNode, totalCost, nodeIds, costs, path
+                        RETURN
+                            totalCost,
+                            costs,
+                            nodes(path) as path
+                        ORDER BY index
+                """;
+        query = String.format(query, user_road, driver_road);
+        return this.session.run(query);
+    }
+
+
 } 
