@@ -37,7 +37,7 @@ public class Nearby extends Endpoint {
             if (result.hasNext()){
                 JSONObject res = new JSONObject();
                 
-                Record user = result.next();
+                // Record user = result.next();
                 Double radius = Double.parseDouble(rad);
                 Result drivers = this.dao.findDriversWithinRadius(uid,radius);
 

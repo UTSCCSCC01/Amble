@@ -35,18 +35,29 @@ public class Navigation extends Endpoint {
             if (result.hasNext() && result1.hasNext()){
                 JSONObject res = new JSONObject();
                 
-                Record user = result.next();
-                Record driver = result1.next();
-
-                Result shortestpath = this.dao.findShortestPath(uid, duid);
-                if (!shortestpath.hasNext()){
-                    System.out.println("Unable to find distance");
-                    return;
-                }
-                
                 JSONObject data = new JSONObject();
-                // TODO
+                Result shortestpath = this.dao.findShortestPath(uid, duid);
+                
+                int total_time = 0;
 
+                
+                while (shortestpath.hasNext()){
+                    Record roads = result.next();
+                    // ! check if its the name
+                    String street = roads.get("n.name").asString();
+                    Boolean has_traffic = roads.get("n.has_traffic").asBoolean();
+                    
+                    // Boolean travel_time = roads.get("n.travel_time").asBoolean();
+
+                    JSONObject route = new JSONObject();
+                    route.put("street", street);
+                    route.put("has_traffic", has_traffic);
+                    // route.put("time", travel_time);
+                }
+
+                // Add route and time to data
+                data.put("total_time", total_time); 
+                // data.put("route", route);
                 
                 // Add Status
                 res.put("status", "OK");
