@@ -17,7 +17,6 @@ public class Nearby extends Endpoint {
             If a driver is exactly radius km away, DO NOT include their uid in the returned uids
             // ! If a driver requests a trip, include their own uid in the returned uids
      */
-
     @Override
     public void handleGet(HttpExchange r) throws IOException, JSONException {
 
