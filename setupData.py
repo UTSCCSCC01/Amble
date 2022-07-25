@@ -143,10 +143,8 @@ RoadConnections = {
 }
 
 def createUser(userObj, isDriver):
-  print("Creating User...")
   req = requests.post(userUrl + '/user/register', json=userObj)
   uid = None
-  print(userObj)
   if (req.status_code == 200):
     uid = req.json()['uid']
     req = requests.put(locationUrl + '/location/user', json={"uid": uid, "is_driver": isDriver})
@@ -158,7 +156,7 @@ def createUser(userObj, isDriver):
 
 print("Creating User...")
 # Create user
-# createUser(userObj, False)
+createUser(userObj, False)
 
 print("Creating Drivers...")
 for driver in Drivers:
