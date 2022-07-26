@@ -15,11 +15,11 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 /**
- * Please write your tests in this class. 
+ * Please write your tests in this class.
  */
- 
+
 public class AppTest {
-    final static String API_URL = "http://localhost:8004";
+    final static String API_URL = "http://apigateway:8000";
 
     private static HttpResponse<String> sendRequest(String endpoint, String method, String reqBody) throws InterruptedException, IOException {
         HttpClient client = HttpClient.newHttpClient();

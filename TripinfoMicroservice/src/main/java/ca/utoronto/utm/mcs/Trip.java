@@ -47,7 +47,7 @@ public class Trip extends Endpoint {
 			doc = this.dao.getTrip(uid);
             if(doc == null){
                 this.sendStatus(r, 404);
-
+                return;
             }
 		} 
 		catch (Exception e) {
@@ -83,6 +83,7 @@ public class Trip extends Endpoint {
         
 		if(!flag){
             this.sendStatus(r, 500);
+            return;
         }
 	
 
