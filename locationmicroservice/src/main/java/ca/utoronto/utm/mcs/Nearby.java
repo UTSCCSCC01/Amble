@@ -77,9 +77,9 @@ public class Nearby extends Endpoint {
                 driver_street = driver.get("street").asString();
 
                 Result distance = this.dao.findDistance(user_lat, user_lon, driver_lat, driver_lon);
-                double distanceMeters =  distance.next().get(0).asDouble()/1000;
+                double dist =  distance.next().get(0).asDouble()/1000;
 
-                if(distanceMeters < rad){
+                if(dist < rad){
                     driverID.put("longitude", driver_lon);
                     driverID.put("latitude", driver_lat);
                     driverID.put("street", driver_street);
@@ -87,11 +87,11 @@ public class Nearby extends Endpoint {
                 }
 
             }
-            
             if (data.length() == 0){
                 this.sendStatus(r, 404);
                 return;
             }
+            // data.isNull(arg0)
             res.put("data", data);
             this.sendResponse(r, res, 200);
 
