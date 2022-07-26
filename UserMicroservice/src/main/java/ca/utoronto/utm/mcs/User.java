@@ -79,6 +79,7 @@ public class User extends Endpoint {
 		data.put("email", email);
 		data.put("rides", rides);
 		data.put("isDriver", isDriver);
+		
 		resp.put("data", data);
 
 		this.sendResponse(r, resp, 200);
