@@ -150,7 +150,7 @@ def createUser(userObj, isDriver):
     req = requests.put(locationUrl + '/location/user', json={"uid": uid, "is_driver": isDriver})
     print(req)
     if (req.status_code == 200):
-      req = requests.patch(locationUrl + f'/location/{uid}',json={"latitude": 0, "longitude": 0, "street": "Liut Lights"})
+      req = requests.patch(locationUrl + f'/location/{uid}',json={"latitude": 0.0, "longitude": 0.0, "street": "Liut Lights"})
       print(req)
   return uid
 
