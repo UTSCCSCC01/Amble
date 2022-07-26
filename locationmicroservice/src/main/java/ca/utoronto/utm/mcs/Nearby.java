@@ -28,6 +28,7 @@ public class Nearby extends Endpoint {
         int rad;
         String uid;
         try{
+
             String [] x =  params[0].split("/");
             if(x.length != 4 || x[x.length - 1].isEmpty()){
                 throw new Exception();
@@ -84,6 +85,7 @@ public class Nearby extends Endpoint {
                     driverID.put("street", driver_street);
                     data.put(d_uid, driverID);
                 }
+
             }
             if (data.length() == 0){
                 this.sendStatus(r, 404);
