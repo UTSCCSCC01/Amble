@@ -70,6 +70,7 @@ public class Drivetime extends Endpoint {
             doc = this.dao.getTrip(uid);
             if(doc == null){
                 this.sendStatus(r, 404);
+                return;
             }
         } 
         catch (Exception e) {
@@ -99,17 +100,11 @@ public class Drivetime extends Endpoint {
         try{
             String url = "http://locationmicroservice:8000/location/navigation/%s?passengerUid=%s";
             url = String.format(url, driverid, passengerid);
-
-            //Build the request object
-            Builder req = HttpRequest.newBuilder();
-            req.uri(URI.create(url)); 
-            BodyPublisher payload_body = BodyPublishers.noBody();
-            req.method("GET", payload_body);
-            HttpRequest finalized_req = req.build();
-
             HttpClient http_client = HttpClient.newHttpClient();
-            //Send Response
-            response = http_client.send(finalized_req, BodyHandlers.ofInputStream());
+            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).build();
+
+            response = http_client.send(request, BodyHandlers.ofInputStream());
+
         }catch(Exception e){
             this.sendStatus(r, 500);
             return;

@@ -19,7 +19,7 @@ import java.net.http.HttpResponse;
  */
 
 public class AppTest {
-    final static String API_URL = "http://localhost:8004";
+    final static String API_URL = "http://apigateway:8000";
 
     private static HttpResponse<String> sendRequest(String endpoint, String method, String reqBody) throws InterruptedException, IOException {
         HttpClient client = HttpClient.newHttpClient();

@@ -80,19 +80,18 @@ public class Request extends Endpoint {
 
         //Sends a http request to the location microservice /nearbydriver to get a json payload.
         try{
+            System.out.println("--------Starting to send request--------------");
+
+            //Verified
             String url = "http://locationmicroservice:8000/location/nearbyDriver/%s?radius=%d";
             url = String.format(url, uid, radius);
-
-            //Build the request object
-            Builder req = HttpRequest.newBuilder();
-            req.uri(URI.create(url)); 
-            BodyPublisher payload_body = BodyPublishers.noBody();
-            req.method("GET", payload_body);
-            HttpRequest finalized_req = req.build();
-
             HttpClient http_client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).build();
+            
             //Send Response
-            response = http_client.send(finalized_req, BodyHandlers.ofInputStream());
+            System.out.println("Gonna start running the send req");
+            response = http_client.send(request, BodyHandlers.ofInputStream());
+            System.out.println("--------Finished to send request--------------");
         }catch(Exception e){
             this.sendStatus(r, 500);
             return;
@@ -111,6 +110,7 @@ public class Request extends Endpoint {
             body_server = Utils.convert(response.body());
 		    deserialized_body_server = new JSONObject(body_server);
         }catch(Exception e){
+
             this.sendStatus(r, 500);
             return;
         }
@@ -134,7 +134,7 @@ public class Request extends Endpoint {
 
         JSONObject final_response = new JSONObject();
         
-        final_response.put("data", keys);
+        final_response.put("data", data_value);
         
         this.sendResponse(r, final_response, 200);
     }
