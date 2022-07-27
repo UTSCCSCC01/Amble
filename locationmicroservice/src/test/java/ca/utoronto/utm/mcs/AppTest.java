@@ -53,24 +53,21 @@ public class AppTest {
     }
     
     public void join_roads(String road_1, String road_2) throws JSONException, InterruptedException, IOException{
-        
         // Adding Roads
         JSONObject rq = new JSONObject();
                 rq.put("roadName", road_1);
                 rq.put("hasTraffic", false);
         sendRequest("/location/road", "PUT", rq.toString());
-
         rq = new JSONObject();
                 rq.put("roadName", road_2);
                 rq.put("hasTraffic", true);
         sendRequest("/location/road", "PUT", rq.toString());
-
         // Join the road
         rq = new JSONObject();
                 rq.put("roadName1", road_1);
                 rq.put("roadName2", road_2);
                 rq.put("hasTraffic", true);
-                rq.put("time", 113);
+                rq.put("time", 60);
         sendRequest("/location/hasRoute", "POST", rq.toString());
     }
 
@@ -105,7 +102,7 @@ public class AppTest {
 
 
 
-    
+
 
 
     @Test
