@@ -21,14 +21,11 @@ import java.nio.charset.StandardCharsets;
    
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AppTest {
-    final static String API_URL = "http://apigateway:8004";
-       
-    /**
-     * @throws JSONException
-     * 
-     */
     
-//    @BeforeAll
+    final static String API_URL = "http://apigateway:8004";
+    
+    
+    //@BeforeAll
     private static HttpResponse<String> sendRequest(String endpoint, String method, String reqBody) throws InterruptedException, IOException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
@@ -39,20 +36,20 @@ public class AppTest {
     }
 
 
+    // Test cases
     @Test
     @Order(1)
-    public void postRegister200() throws JSONException, InterruptedException, IOException{
+    public void postRegister_200() throws JSONException, InterruptedException, IOException{
         JSONObject rq = new JSONObject();
-        rq.put("name", "ABC");
+            rq.put("name", "ABC");
             rq.put("email", "ABC@gmail.com");
-            rq.put("password", "12345");
-            
+            rq.put("password", "12345");    
         HttpResponse<String> confirmRes = sendRequest("/user/register", "POST", rq.toString());
         assertEquals(HttpURLConnection.HTTP_OK, confirmRes.statusCode());   
     }
     @Test
     @Order(2)
-    public void postRegister400() throws JSONException, InterruptedException, IOException{
+    public void postRegister_400() throws JSONException, InterruptedException, IOException{
         JSONObject rq = new JSONObject();
         rq.put("email", "ABC@gmail.com");
         rq.put("password", "12345");
@@ -62,7 +59,7 @@ public class AppTest {
     }
     @Test
     @Order(3)
-    public void postRegister409() throws JSONException, InterruptedException, IOException{
+    public void postRegister_409() throws JSONException, InterruptedException, IOException{
         JSONObject rq = new JSONObject();
         rq.put("name", "ABC");
         rq.put("email", "ABC@gmail.com");
@@ -71,9 +68,13 @@ public class AppTest {
         HttpResponse<String> confirmRes = sendRequest("/user/register", "POST", rq.toString());
         assertEquals(HttpURLConnection.HTTP_CONFLICT, confirmRes.statusCode());  
     }
+    
+    
+    
+    
     @Test
     @Order(4)
-    public void postLogin200() throws JSONException, InterruptedException, IOException{
+    public void postLogin_200() throws JSONException, InterruptedException, IOException{
         JSONObject rq = new JSONObject();
         rq.put("email", "ABC@gmail.com");
         rq.put("password", "12345");
@@ -83,7 +84,7 @@ public class AppTest {
     }
     @Test
     @Order(5)
-    public void postLogin400() throws JSONException, InterruptedException, IOException{
+    public void postLogin_400() throws JSONException, InterruptedException, IOException{
         JSONObject rq = new JSONObject();
         rq.put("email", "ABC@gmail.com");
         HttpResponse<String> confirmRes = sendRequest("/user/login", "POST", rq.toString());
@@ -91,7 +92,7 @@ public class AppTest {
     }
     @Test
     @Order(6)
-    public void postLogin401() throws JSONException, InterruptedException, IOException{
+    public void postLogin_401() throws JSONException, InterruptedException, IOException{
         JSONObject rq = new JSONObject();
         rq.put("email", "ABC@gmail.com");
         rq.put("password", "1234");
@@ -101,7 +102,7 @@ public class AppTest {
     }
     @Test
     @Order(7)
-    public void postLogin404() throws JSONException, InterruptedException, IOException{
+    public void postLogin_404() throws JSONException, InterruptedException, IOException{
         JSONObject rq = new JSONObject();
         rq.put("email", "Xyz@gmail.com");
         rq.put("password", "1234");
