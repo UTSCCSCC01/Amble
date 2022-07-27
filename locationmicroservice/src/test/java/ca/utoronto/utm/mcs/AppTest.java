@@ -24,7 +24,7 @@ import java.net.http.HttpResponse;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AppTest {
-    final static String API_URL = "http://apigateway:8004";
+    final static String API_URL = "http://locationmicroservice:8000";
 
     private static HttpResponse<String> sendRequest(String endpoint, String method, String reqBody) throws InterruptedException, IOException {
         HttpClient client = HttpClient.newHttpClient();
@@ -33,23 +33,30 @@ public class AppTest {
 //                .version(HttpClient.Version.HTTP_1_1)
                 .method(method, HttpRequest.BodyPublishers.ofString(reqBody))
                 .build();
+
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     // @BeforeAll
     public void createUser(String uid, boolean isDriver, String street) throws JSONException, IOException, InterruptedException {
+        //WORKS
         JSONObject rq = new JSONObject();
         rq.put("uid", uid);
         rq.put("is_driver", isDriver);
         sendRequest("/location/user", "PUT", rq.toString());
 
+        //PRECONDITION: User has been added to the database already. 
         JSONObject streetrq = new JSONObject();
+        double x = 0.0;
+        streetrq.put("latitude", x);
+        streetrq.put("longitude", x);
         streetrq.put("street", street);
-        streetrq.put("latitude", street);
-        streetrq.put("longitude", street);
-        // String streetRQ = String.format("{\"street\":\"%s\",\"latitude\":0.0,\"longitude\":0.0}", street);
+
+        //verify payload
         String street_endpoint = String.format("/location/%s", uid);
-        sendRequest(street_endpoint, "PATCH", streetrq.toString());
+        String streetRQ = String.format("{\"street\":\"%s\",\"latitude\":0.0,\"longitude\":0.0}", street);
+   
+        HttpResponse<String> test = sendRequest(street_endpoint, "PATCH", streetRQ);
     }
     
     public void join_roads(String road_1, String road_2) throws JSONException, InterruptedException, IOException{
@@ -77,7 +84,7 @@ public class AppTest {
         createUser("90", true, "xyz");
         
         int rad = 10;
-        String endpoint = String.format("/location/nearbyDriver/%s?radius=%d", uid, rad);
+        String endpoint = String.format("/location/nearbyDriver/%s?radius=%d", "90", rad);
         JSONObject rq = new JSONObject();
         HttpResponse<String> confirmRes = sendRequest(endpoint, "GET", rq.toString());
         assertEquals(HttpURLConnection.HTTP_OK, confirmRes.statusCode());
@@ -85,7 +92,7 @@ public class AppTest {
     @Test
     @Order(2)
     public void getNearbyDriver404() throws IOException, InterruptedException, JSONException {
-        String endpoint = String.format("/location/nearbyDriver/90?radius=0");
+        String endpoint = String.format("/location/nearbyDriver/777?radius=1");
         JSONObject rq = new JSONObject();
         HttpResponse<String> confirmRes = sendRequest(endpoint, "GET", rq.toString());
         assertEquals(HttpURLConnection.HTTP_NOT_FOUND, confirmRes.statusCode());
@@ -102,11 +109,12 @@ public class AppTest {
 
 
     @Test
-    @Order(4)
+    @Order(4) //BROKEN 
     public void getNavRoute200() throws IOException, InterruptedException, JSONException {
         createUser("1", true, "road_1");
         createUser("2", false, "road_2");
-        join_roads("road_1", "road_1");
+
+        join_roads("road_1", "road_2");
 
         String endpoint = String.format("/location/navigation/1?passengerUid=2");
         JSONObject rq = new JSONObject();

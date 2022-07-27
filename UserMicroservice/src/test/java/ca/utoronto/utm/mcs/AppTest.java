@@ -22,11 +22,11 @@ import java.nio.charset.StandardCharsets;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AppTest {
     
-    final static String API_URL = "http://apigateway:8004";
+    final static String API_URL = "http://usermicroservice:8000";
     
     
     //@BeforeAll
-    private static HttpResponse<String> sendRequest(String endpoint, String method, String reqBody) throws InterruptedException, IOException {
+    public static HttpResponse<String> sendRequest(String endpoint, String method, String reqBody) throws InterruptedException, IOException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(API_URL + endpoint))
@@ -35,8 +35,6 @@ public class AppTest {
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
-
-    // Test cases
     @Test
     @Order(1)
     public void postRegister_200() throws JSONException, InterruptedException, IOException{
@@ -45,7 +43,9 @@ public class AppTest {
             rq.put("email", "ABC@gmail.com");
             rq.put("password", "12345");    
         HttpResponse<String> confirmRes = sendRequest("/user/register", "POST", rq.toString());
-        assertEquals(HttpURLConnection.HTTP_OK, confirmRes.statusCode());   
+        assertEquals(HttpURLConnection.HTTP_OK, confirmRes.statusCode());  
+        // System.out.println("TEST 1 MOCK VALUE:"+ HttpURLConnection.HTTP_OK);
+        // System.out.println("___xyz_____"+confirmRes.statusCode()); 
     }
     @Test
     @Order(2)
@@ -56,6 +56,9 @@ public class AppTest {
         
         HttpResponse<String> confirmRes = sendRequest("/user/register", "POST", rq.toString());
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, confirmRes.statusCode());  
+        // System.out.println("TEST 2 STATUS CODE: "+ confirmRes.statusCode());
+        // System.out.println("TEST 2 MOCK VALUE:" + HttpURLConnection.HTTP_BAD_REQUEST);
+        // System.out.println("finished order 2");
     }
     @Test
     @Order(3)
@@ -68,8 +71,6 @@ public class AppTest {
         HttpResponse<String> confirmRes = sendRequest("/user/register", "POST", rq.toString());
         assertEquals(HttpURLConnection.HTTP_CONFLICT, confirmRes.statusCode());  
     }
-    
-    
     
     
     @Test
@@ -110,11 +111,6 @@ public class AppTest {
         HttpResponse<String> confirmRes = sendRequest("/user/login", "POST", rq.toString());
         assertEquals(HttpURLConnection.HTTP_NOT_FOUND, confirmRes.statusCode());  
     }
-
-
-
-
-
 
 
 }
