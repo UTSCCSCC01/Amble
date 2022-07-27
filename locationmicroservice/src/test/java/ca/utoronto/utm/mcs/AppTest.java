@@ -71,7 +71,6 @@ public class AppTest {
         sendRequest("/location/hasRoute", "POST", rq.toString());
     }
 
-
     @Test
     @Order(1)
     public void getNearbyDriver200() throws IOException, InterruptedException, JSONException {
@@ -99,9 +98,6 @@ public class AppTest {
         HttpResponse<String> confirmRes = sendRequest(endpoint, "GET", rq.toString());
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, confirmRes.statusCode());
     }
-
-
-
 
 
 
@@ -133,11 +129,5 @@ public class AppTest {
         HttpResponse<String> confirmRes = sendRequest(endpoint, "GET", rq.toString());
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, confirmRes.statusCode());
     }
-
-
-
-
-
-
 
 }
