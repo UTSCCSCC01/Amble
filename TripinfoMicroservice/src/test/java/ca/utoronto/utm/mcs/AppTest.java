@@ -32,6 +32,14 @@ public class AppTest {
                 .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
+    private static HttpResponse<String> sendRequest(String URL, String endpoint, String method, String reqBody) throws InterruptedException, IOException {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(URL + endpoint))
+                .method(method, HttpRequest.BodyPublishers.ofString(reqBody))
+                .build();
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
 
 
     // Helper Function
@@ -41,7 +49,7 @@ public class AppTest {
         JSONObject rq = new JSONObject();
         rq.put("uid", uid);
         rq.put("is_driver", isDriver);
-        sendRequest("/location/user", "PUT", rq.toString());
+        HttpResponse<String> test1 = sendRequest("http://locationmicroservice:8000","/location/user", "PUT", rq.toString());
 
         //PRECONDITION: User has been added to the database already. 
         JSONObject streetrq = new JSONObject();
@@ -49,12 +57,13 @@ public class AppTest {
         streetrq.put("latitude", x);
         streetrq.put("longitude", x);
         streetrq.put("street", street);
-
         //verify payload
         String street_endpoint = String.format("/location/%s", uid);
         String streetRQ = String.format("{\"street\":\"%s\",\"latitude\":0.0,\"longitude\":0.0}", street);
-   
-        HttpResponse<String> test = sendRequest(street_endpoint, "PATCH", streetRQ);
+        
+        HttpResponse<String> test = sendRequest("http://locationmicroservice:8000",street_endpoint, "PATCH", streetRQ);
+        // System.out.println(String.valueOf(test1.statusCode()) + test1.body().toString());
+        // System.out.println(String.valueOf(test.statusCode()) + test.body().toString());
     }
         // Join Roads    
     public void join_roads(String road_1, String road_2) throws JSONException, InterruptedException, IOException{
@@ -62,18 +71,18 @@ public class AppTest {
         JSONObject rq = new JSONObject();
                 rq.put("roadName", road_1);
                 rq.put("hasTraffic", false);
-        sendRequest("/location/road", "PUT", rq.toString());
+        sendRequest("http://locationmicroservice:8000","/location/road", "PUT", rq.toString());
         rq = new JSONObject();
                 rq.put("roadName", road_2);
                 rq.put("hasTraffic", true);
-        sendRequest("/location/road", "PUT", rq.toString());
+        sendRequest("http://locationmicroservice:8000","/location/road", "PUT", rq.toString());
         // Join the road
         rq = new JSONObject();
                 rq.put("roadName1", road_1);
                 rq.put("roadName2", road_2);
                 rq.put("hasTraffic", true);
                 rq.put("time", 60);
-        sendRequest("/location/hasRoute", "POST", rq.toString());
+        sendRequest("http://locationmicroservice:8000","/location/hasRoute", "POST", rq.toString());
     }
         // 
 
@@ -178,15 +187,30 @@ public class AppTest {
             rq.put("timeElapsed", 666);
             rq.put("totalCost", "130.0");
 
-        HttpResponse<String> confirmRes = sendRequest("/trip/woho", "PATCH", rq.toString());
+        HttpResponse<String> confirmRes = sendRequest("/trip/", "PATCH", rq.toString());
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, confirmRes.statusCode());
+    }
+
+    @Test
+    @Order(8)
+    public void patchUpdateTrip404() throws JSONException, IOException, InterruptedException {
+        JSONObject rq = new JSONObject();
+            rq.put("distance", 2222);
+            rq.put("endTime", 5422);
+            rq.put("timeElapsed", 666);
+            rq.put("totalCost", "130.0");
+
+        HttpResponse<String> confirmRes = sendRequest("/trip/wooohi", "PATCH", rq.toString());
+        assertEquals(HttpURLConnection.HTTP_NOT_FOUND, confirmRes.statusCode());
     }
     
     
 
     @Test
-    @Order(8)
+    @Order(9)
     public void getPassengerTrips200() throws JSONException, IOException, InterruptedException {
+        
+        
         JSONObject rq = new JSONObject();
         String endpoint = String.format("/trip/passenger/%s", "3");
         HttpResponse<String> confirmRes = sendRequest(endpoint, "GET", rq.toString());
@@ -194,7 +218,7 @@ public class AppTest {
     }
 
     @Test
-    @Order(9)
+    @Order(10)
     public void getPassengerTrips400() throws JSONException, IOException, InterruptedException {
         JSONObject rq = new JSONObject();
         String endpoint = String.format("/trip/passenger/");
@@ -204,7 +228,7 @@ public class AppTest {
 
 
     @Test
-    @Order(10)
+    @Order(11)
     public void getPassengerTrips404() throws JSONException, IOException, InterruptedException {
         JSONObject rq = new JSONObject();
         String endpoint = String.format("/trip/passenger/56");
@@ -216,7 +240,7 @@ public class AppTest {
 
     
     @Test
-    @Order(11)
+    @Order(12)
     public void getDriverTrips200() throws JSONException, IOException, InterruptedException {
         JSONObject rq = new JSONObject();
         String endpoint = String.format("/trip/driver/%s", "4");
@@ -227,7 +251,7 @@ public class AppTest {
 
 
     @Test
-    @Order(12)
+    @Order(13)
     public void getDriverTrips400() throws JSONException, IOException, InterruptedException {
         JSONObject rq = new JSONObject();
         String endpoint = String.format("/trip/driver/");
@@ -237,7 +261,7 @@ public class AppTest {
     
 
     @Test
-    @Order(13)
+    @Order(14)
     public void getDriverTrips404() throws JSONException, IOException, InterruptedException {
         JSONObject rq = new JSONObject();
         String endpoint = String.format("/trip/driver/56");
@@ -249,17 +273,29 @@ public class AppTest {
 
     
     @Test
-    @Order(14)
+    @Order(15)
     public void getDriverTime200() throws JSONException, IOException, InterruptedException {
+        // Create a trip
         JSONObject rq = new JSONObject();
-        String endpoint = String.format("/trip/driverTime/%s", t_id);
-        HttpResponse<String> confirmRes = sendRequest(endpoint, "GET", rq.toString());
+                rq.put("driver", "4");
+                rq.put("passenger", "3");
+                rq.put("startTime", 32);
+        HttpResponse<String> confirmRes = sendRequest( "/trip/confirm", "POST", rq.toString());
+        String t_id1 = new JSONObject(confirmRes.body()).getJSONObject("data").getJSONObject("_id").getString("$oid");
+        // System.out.printf("____%s____\n\n", confirmRes.body().toString());
+
+        
+        rq = new JSONObject();
+        // System.out.printf("____%s____", t_id1);
+        String endpoint = String.format("/trip/driverTime/%s", t_id1);
+        confirmRes = sendRequest(endpoint, "GET", rq.toString());
+        // System.out.printf("____%s____\n", confirmRes.body().toString());
         assertEquals(HttpURLConnection.HTTP_OK, confirmRes.statusCode());
     }
 
 
     @Test
-    @Order(15)
+    @Order(16)
     public void getDriverTime400() throws JSONException, IOException, InterruptedException {
         JSONObject rq = new JSONObject();
         String endpoint = String.format("/trip/driverTime/");
@@ -267,7 +303,7 @@ public class AppTest {
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, confirmRes.statusCode());
     }
     @Test
-    @Order(16)
+    @Order(17)
     public void getDriverTime404() throws JSONException, IOException, InterruptedException {
         JSONObject rq = new JSONObject();
         String endpoint = String.format("/trip/driverTime/900");
