@@ -20,7 +20,7 @@ public class Nearby extends Endpoint {
     @Override
     public void handleGet(HttpExchange r) throws IOException, JSONException {
 
-        System.out.println("Inside 0 nearby.java___________");
+        // System.out.println("Inside 0 nearby.java___________");
         String[] params = r.getRequestURI().toString().split("\\?radius=");
         if (params.length != 2 || params[1].isEmpty()) {
             this.sendStatus(r, 400);
@@ -29,12 +29,12 @@ public class Nearby extends Endpoint {
         int rad;
         String uid;
         try{
-            System.out.println("Inside 1 nearby.java___________");
+            // System.out.println("Inside 1 nearby.java___________");
             String [] x =  params[0].split("/");
-            if(x.length != 4 || x[x.length - 1].isEmpty()){
+            if(x.length != 4 || x[x.length-1].isEmpty()){
                 throw new Exception();
             }
-            uid = x[x.length - 1];
+            uid = x[x.length-1];
             rad = Integer.parseInt(params[1]);
             if(rad <= 0){
                 throw new Exception();
@@ -45,11 +45,10 @@ public class Nearby extends Endpoint {
             return;
         }
         
-        System.out.println("Inside 2 nearby.java___________");
+        // System.out.println("Inside 2 nearby.java___________");
         Result result = this.dao.getUserLocationByUid(uid);
         Double user_lon;
         Double user_lat;
-        
         if (result.hasNext()) {
             Record user = result.next();
             user_lon = user.get("n.longitude").asDouble();
@@ -57,9 +56,8 @@ public class Nearby extends Endpoint {
         } else {
             this.sendStatus(r, 404);
             return;
-        }
-        
-        System.out.println("Inside 3 nearby.java___________");
+        }  
+        // System.out.println("Inside 3 nearby.java___________");
         try {
             Result drivers = this.dao.findAllDrivers();
             Value driver;
@@ -70,7 +68,7 @@ public class Nearby extends Endpoint {
             
             JSONObject data = new JSONObject();
             JSONObject res = new JSONObject();
-            System.out.println("Inside 4 nearby.java___________");
+            // System.out.println("Inside 4 nearby.java___________");
             while (drivers.hasNext()) {
                 driver = drivers.next().get(0);
                 JSONObject driverID = new JSONObject();
@@ -91,7 +89,7 @@ public class Nearby extends Endpoint {
                 }
                 
             }
-            System.out.println("Inside 5 nearby.java___________");
+            // System.out.println("Inside 5 nearby.java___________");
             if (data.length() == 0){
                 this.sendStatus(r, 404);
                 return;
