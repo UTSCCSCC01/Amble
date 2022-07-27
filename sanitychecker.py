@@ -1,9 +1,11 @@
 import requests
 
+
+#Modified version of setupData to test dijsktra algorithm
+#
+
 userUrl = 'http://localhost:8001'
-
 locationUrl = 'http://localhost:8000'
-
 tripUrl = 'http://localhost:8002'
 
 #Configurations
@@ -25,121 +27,41 @@ Drivers = [
   "email": "Kyrel@gmail.com",
   "password": "Kyrel"
 },
-{
-  "name": "Ethan",
-  "email": "Ethan@gmail.com",
-  "password": "Ethan"
-},
-{
-  "name": "Daniil",
-  "email": "Daniil@gmail.com",
-  "password": "Daniil"
-},
-{
-  "name": "Nivy",
-  "email": "Nivy@gmail.com",
-  "password": "Nivy"
-},
-{
-  "name": "Chris",
-  "email": "Chris@gmail.com",
-  "password": "Chris"
-},
-{
-  "name": "Lance",
-  "email": "Lance@gmail.com",
-  "password": "Lance"
-},
-{
-  "name": "Manav",
-  "email": "Manav@gmail.com",
-  "password": "Manav"
-}
 ]
 
 
 Roads = [
   {
-    "roadName": "U of T Underpass",
+    "roadName": "a",
     "hasTraffic": True
   },
   {
-    "roadName": "Liut Lights",
+    "roadName": "b",
     "hasTraffic": False
   },
   {
-    "roadName": "MN Drive",
+    "roadName": "c",
     "hasTraffic": True
   },
   {
-    "roadName": "Bergen Blvd",
+    "roadName": "d",
     "hasTraffic": False
   },
   {
-    "roadName": "Zingaro Zone",
+    "roadName": "e",
     "hasTraffic": True
   },
-  {
-    "roadName": "Sushant Summit",
-    "hasTraffic": True
-  },
-  {
-    "roadName": "CCIT Corner",
-    "hasTraffic": False
-  },
-  {
-    "roadName": "Deerfield Dash",
-    "hasTraffic": False
-  },
-  {
-    "roadName": "Ilir Isle",
-    "hasTraffic": False
-  },
-  {
-    "roadName": "IB Island",
-    "hasTraffic": False
-  },
-  {
-    "roadName": "Sonya Street",
-    "hasTraffic": True
-  },
-  {
-    "roadName": "Petersen Park",
-    "hasTraffic": False
-  },
-  {
-    "roadName": "Kaneff St West",
-    "hasTraffic": True
-  },
-  {
-    "roadName": "Sauga Skyway",
-    "hasTraffic": False
-  },
-  {
-    "roadName": "Lisa Lane",
-    "hasTraffic": False
-  },
-  {
-    "roadName": "Davis Dungeon",
-    "hasTraffic": False
-  },
-  {
-    "roadName": "Michael Meadows",
+  { #Not connected to anything
+    "roadName": "f",
     "hasTraffic": True
   }
 ]
 
 RoadConnections = {
-  "U of T Underpass": [("Liut Lights", 4), ("Bergen Blvd", 10), ("Deerfield Dash", 14), ("Sonya Street", 20), ("Sauga Skyway", 22), ("Kaneff St West", 24), ("Michael Meadows", 30)],
-  "Liut Lights": [("MN Drive", 4)],
-  "Bergen Blvd": [("Zingaro Zone", 4)],
-  "Zingaro Zone": [("Sushant Summit", 4)],
-  "Sushant Summit": [("CCIT Corner", 4)],
-  "Deerfield Dash": [("Ilir Isle", 6)],
-  "Sonya Street": [("IB Island", 4), ("Petersen Park", 8)],
-  "Sauga Skyway": [("Lisa Lane", 8)],
-  "Kaneff St West": [("Lisa Lane", 8)],
-  "Michael Meadows": [("Davis Dungeon", 10)]
+  "a": [("b", 1), ("c", 6)],
+  "b": [("c", 2),("d", 1)],
+  "c": [("d",2),("e",5)],
+  "d": [("e",5)],
 }
 
 def createUser(userObj, isDriver):
