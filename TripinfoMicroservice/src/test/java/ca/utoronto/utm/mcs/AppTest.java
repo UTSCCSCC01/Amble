@@ -35,6 +35,50 @@ public class AppTest {
 
 
     // Helper Function
+        // Create User
+    public void createUser(String uid, boolean isDriver, String street) throws JSONException, IOException, InterruptedException {
+        //WORKS
+        JSONObject rq = new JSONObject();
+        rq.put("uid", uid);
+        rq.put("is_driver", isDriver);
+        sendRequest("/location/user", "PUT", rq.toString());
+
+        //PRECONDITION: User has been added to the database already. 
+        JSONObject streetrq = new JSONObject();
+        double x = 0.0;
+        streetrq.put("latitude", x);
+        streetrq.put("longitude", x);
+        streetrq.put("street", street);
+
+        //verify payload
+        String street_endpoint = String.format("/location/%s", uid);
+        String streetRQ = String.format("{\"street\":\"%s\",\"latitude\":0.0,\"longitude\":0.0}", street);
+   
+        HttpResponse<String> test = sendRequest(street_endpoint, "PATCH", streetRQ);
+    }
+        // Join Roads    
+    public void join_roads(String road_1, String road_2) throws JSONException, InterruptedException, IOException{
+        // Adding Roads
+        JSONObject rq = new JSONObject();
+                rq.put("roadName", road_1);
+                rq.put("hasTraffic", false);
+        sendRequest("/location/road", "PUT", rq.toString());
+        rq = new JSONObject();
+                rq.put("roadName", road_2);
+                rq.put("hasTraffic", true);
+        sendRequest("/location/road", "PUT", rq.toString());
+        // Join the road
+        rq = new JSONObject();
+                rq.put("roadName1", road_1);
+                rq.put("roadName2", road_2);
+                rq.put("hasTraffic", true);
+                rq.put("time", 60);
+        sendRequest("/location/hasRoute", "POST", rq.toString());
+    }
+        // Create Trip
+
+
+    //
 
 
     // Test Cases
@@ -42,7 +86,13 @@ public class AppTest {
     @Order(1)
     public void postReqTrip200() throws JSONException, IOException, InterruptedException {
 
-        // Create 
+        // Create driver
+        createUser("3", true, "road_1");
+        // Create passenger
+
+        // Join roads
+
+        // 
 
         JSONObject rq = new JSONObject();
                 rq.put("uid", "3");
@@ -174,6 +224,7 @@ public class AppTest {
         HttpResponse<String> confirmRes = sendRequest(endpoint, "GET", rq.toString());
         assertEquals(HttpURLConnection.HTTP_NOT_FOUND, confirmRes.statusCode());
     }
+    
     @Test
     @Order(14)
     public void getDriverTime200() throws JSONException, IOException, InterruptedException {
