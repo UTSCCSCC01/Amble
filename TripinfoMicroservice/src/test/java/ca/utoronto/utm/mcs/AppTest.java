@@ -21,8 +21,8 @@ import java.nio.charset.StandardCharsets;
  
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AppTest {
-    final static String API_URL = "http://apigateway:8004";
-    String t_id;
+    final static String API_URL = "http://tripinfomicroservice:8000";
+    public String t_id;
 
     private static HttpResponse<String> sendRequest(String endpoint, String method, String reqBody) throws InterruptedException, IOException {
         HttpClient client = HttpClient.newHttpClient();
@@ -75,9 +75,10 @@ public class AppTest {
                 rq.put("time", 60);
         sendRequest("/location/hasRoute", "POST", rq.toString());
     }
-        // Create Trip
+        // 
 
 
+        
     //
 
 
@@ -85,14 +86,14 @@ public class AppTest {
     @Test
     @Order(1)
     public void postReqTrip200() throws JSONException, IOException, InterruptedException {
+        // Create passenger (3)
+        createUser("3", false, "road_2");
 
-        // Create driver
-        createUser("3", true, "road_1");
-        // Create passenger
+        // Create driver (4)
+        createUser("4", true, "road_1");
 
         // Join roads
-
-        // 
+        join_roads("road_1", "road_2");
 
         JSONObject rq = new JSONObject();
                 rq.put("uid", "3");
@@ -121,10 +122,10 @@ public class AppTest {
         assertEquals(HttpURLConnection.HTTP_NOT_FOUND, confirmRes.statusCode());
     }
 
+
     @Test
     @Order(4)
     public void postConTrip200() throws JSONException, IOException, InterruptedException {
-
         JSONObject rq = new JSONObject();
                 rq.put("driver", "4");
                 rq.put("passenger", "3");
@@ -132,6 +133,7 @@ public class AppTest {
         HttpResponse<String> confirmRes = sendRequest("/trip/confirm", "POST", rq.toString());
         assertEquals(HttpURLConnection.HTTP_OK, confirmRes.statusCode());   
     }
+    
     @Test
     @Order(5)
     public void postConTrip400() throws JSONException, IOException, InterruptedException {
@@ -142,6 +144,9 @@ public class AppTest {
         HttpResponse<String> confirmRes = sendRequest("/trip/confirm", "POST", rq.toString());
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, confirmRes.statusCode());   
     }
+
+
+    
     @Test
     @Order(6)
     public void patchUpdateTrip200() throws JSONException, IOException, InterruptedException {
@@ -163,6 +168,7 @@ public class AppTest {
         confirmRes = sendRequest(endpoint, "PATCH", rq.toString());
         assertEquals(HttpURLConnection.HTTP_OK, confirmRes.statusCode());
     }
+
     @Test
     @Order(7)
     public void patchUpdateTrip400() throws JSONException, IOException, InterruptedException {
@@ -175,14 +181,18 @@ public class AppTest {
         HttpResponse<String> confirmRes = sendRequest("/trip/woho", "PATCH", rq.toString());
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, confirmRes.statusCode());
     }
+    
+    
+
     @Test
     @Order(8)
     public void getPassengerTrips200() throws JSONException, IOException, InterruptedException {
         JSONObject rq = new JSONObject();
-        String endpoint = String.format("/trip/passenger/%s", 3);
+        String endpoint = String.format("/trip/passenger/%s", "3");
         HttpResponse<String> confirmRes = sendRequest(endpoint, "GET", rq.toString());
         assertEquals(HttpURLConnection.HTTP_OK, confirmRes.statusCode());
     }
+
     @Test
     @Order(9)
     public void getPassengerTrips400() throws JSONException, IOException, InterruptedException {
@@ -191,6 +201,8 @@ public class AppTest {
         HttpResponse<String> confirmRes = sendRequest(endpoint, "GET", rq.toString());
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, confirmRes.statusCode());
     }
+
+
     @Test
     @Order(10)
     public void getPassengerTrips404() throws JSONException, IOException, InterruptedException {
@@ -200,14 +212,20 @@ public class AppTest {
         assertEquals(HttpURLConnection.HTTP_NOT_FOUND, confirmRes.statusCode());
     }
 
+
+
+    
     @Test
     @Order(11)
     public void getDriverTrips200() throws JSONException, IOException, InterruptedException {
         JSONObject rq = new JSONObject();
-        String endpoint = String.format("/trip/driver/%s", 4);
+        String endpoint = String.format("/trip/driver/%s", "4");
         HttpResponse<String> confirmRes = sendRequest(endpoint, "GET", rq.toString());
         assertEquals(HttpURLConnection.HTTP_OK, confirmRes.statusCode());
     }
+
+
+
     @Test
     @Order(12)
     public void getDriverTrips400() throws JSONException, IOException, InterruptedException {
@@ -216,6 +234,8 @@ public class AppTest {
         HttpResponse<String> confirmRes = sendRequest(endpoint, "GET", rq.toString());
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, confirmRes.statusCode());
     }
+    
+
     @Test
     @Order(13)
     public void getDriverTrips404() throws JSONException, IOException, InterruptedException {
@@ -225,6 +245,9 @@ public class AppTest {
         assertEquals(HttpURLConnection.HTTP_NOT_FOUND, confirmRes.statusCode());
     }
     
+
+
+    
     @Test
     @Order(14)
     public void getDriverTime200() throws JSONException, IOException, InterruptedException {
@@ -233,6 +256,8 @@ public class AppTest {
         HttpResponse<String> confirmRes = sendRequest(endpoint, "GET", rq.toString());
         assertEquals(HttpURLConnection.HTTP_OK, confirmRes.statusCode());
     }
+
+
     @Test
     @Order(15)
     public void getDriverTime400() throws JSONException, IOException, InterruptedException {
