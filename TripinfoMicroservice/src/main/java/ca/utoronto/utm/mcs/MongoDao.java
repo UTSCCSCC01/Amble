@@ -27,8 +27,8 @@ public class MongoDao {
 
 	private final String username = "root";
 	private final String password = "123456";
-	private final String uriDb = String.format("mongodb://%s:%s@mongodb:27017", username, password);
-	private final String dbName = "trips";
+	private final String uriDb = String.format("mongodb://%s:%s@%s:27017", username, password, Dotenv.load().get("MONGODB_ADDR"));
+	private final String dbName = "trip";
 
 	public MongoDao() {
         // TODO: 

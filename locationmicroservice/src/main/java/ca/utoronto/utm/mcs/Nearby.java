@@ -80,7 +80,7 @@ public class Nearby extends Endpoint {
                 driver_lat = driver.get("latitude").asDouble();
                 driver_street = driver.get("street").asString();
 
-                Result distance = this.dao.findDistance(user_lat, user_lon, driver_lat, driver_lon);
+                Result distance = this.dao.findDistance(user_lon, user_lat, driver_lon, driver_lat);
                 double dist =  distance.next().get(0).asDouble()/1000;
 
                 if(dist < rad){
