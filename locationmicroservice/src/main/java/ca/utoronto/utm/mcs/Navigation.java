@@ -25,8 +25,6 @@ public class Navigation extends Endpoint {
         String[] params = r.getRequestURI().toString().split("\\?passengerUid=");
         String p_uid;
         String d_uid;
-        JSONObject res = new JSONObject();
-        JSONObject data = new JSONObject();
 
         if (params.length != 2 || params[1].isEmpty()) {
             this.sendStatus(r, 400);
@@ -103,7 +101,10 @@ public class Navigation extends Endpoint {
             prv_dist = distances.get(i);
             i++;
         }
-
+        
+        JSONObject res = new JSONObject();
+        JSONObject data = new JSONObject();
+        
         res.put("status", "OK");
             data.put("total_time", total_time);
             data.put("route", route);

@@ -80,7 +80,7 @@ public class Request extends Endpoint {
 
         //Sends a http request to the location microservice /nearbydriver to get a json payload.
         try{
-            System.out.println("--------Starting to send request--------------");
+            // System.out.println("--------Starting to send request--------------");
 
             //Verified
             String url = "http://locationmicroservice:8000/location/nearbyDriver/%s?radius=%d";
@@ -89,9 +89,9 @@ public class Request extends Endpoint {
             HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).build();
             
             //Send Response
-            System.out.println("Gonna start running the send req");
+            // System.out.println("Gonna start running the send req");
             response = http_client.send(request, BodyHandlers.ofInputStream());
-            System.out.println("--------Finished to send request--------------");
+            // System.out.println("--------Finished to send request--------------");
         }catch(Exception e){
             this.sendStatus(r, 500);
             return;

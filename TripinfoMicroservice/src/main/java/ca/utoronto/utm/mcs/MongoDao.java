@@ -42,18 +42,18 @@ public class MongoDao {
 
 	// *** implement database operations here *** //
 	public JSONObject addTrip(String driver, String passenger, int startTime) throws JSONException, MongoWriteException, MongoException, Exception{
-		System.out.println("created the document");
+		// System.out.println("created the document");
 		Document doc = new Document();
         doc.put("driver", driver);
         doc.put("passenger", passenger);
         doc.put("startTime", startTime);
-		System.out.println("trying to insert");
+		// System.out.println("trying to insert");
 		// Convert insert document into a json.
         this.collection.insertOne(doc);
 		String rep = doc.toJson().toString();
 		JSONObject result = new JSONObject(rep);
 
-		System.out.println("Creating fields");
+		// System.out.println("Creating fields");
 		// Create the id field
 		JSONObject idField = new JSONObject();
 		idField.put("_id", result.get("_id"));
